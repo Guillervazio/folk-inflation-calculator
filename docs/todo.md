@@ -13,10 +13,10 @@
 
 ### Spikes (hacer primero: sus resultados cambian el plan)
 
-- [ ] 🚧 **S1** — Investigar el QR de los comprobantes electrónicos paraguayos: si existe una vía para obtener el detalle de ítems de forma verificable y programática, y qué proporción de tickets lo trae hoy. Documentar el hallazgo en `docs/spikes/S1-qr-comprobante.md`.
-- [ ] 🚧 **S1** — Si S1 resulta viable: reevaluar la prioridad de la épica E3 antes de escribir una línea de extracción con IA.
-- [ ] **S2** — Verificar qué publica el BCP sobre el IPC: serie histórica, ponderaciones de la canasta, formato, frecuencia y condiciones de uso. Documentar en `docs/spikes/S2-ipc-oficial.md`.
-- [ ] **S2** — Si no hay ponderaciones oficiales reutilizables: definir y documentar la alternativa propia de ponderación.
+- [x] **S1** — Investigar el QR de los comprobantes electrónicos paraguayos: si existe una vía para obtener el detalle de ítems de forma verificable y programática, y qué proporción de tickets lo trae hoy. → [S1-qr-comprobante.md](spikes/S1-qr-comprobante.md), veredicto **parcial**.
+- [x] **S1** — Reevaluada la prioridad de E3: **se mantiene como camino principal**. El detalle de ítems sale del XML del Documento Electrónico, no del QR, y sólo lo tiene el receptor que además es facturador electrónico; con el cronograma de incorporación abierto hasta septiembre de 2027, seguirán llegando tickets sin XML durante toda la transición.
+- [x] **S2** — Verificar qué publica el BCP sobre el IPC: serie histórica, ponderaciones de la canasta, formato, frecuencia y condiciones de uso. → [S2-ipc-oficial.md](spikes/S2-ipc-oficial.md).
+- [x] **S2** — No hace falta alternativa propia de ponderación: las oficiales (EPF 2015/16, base dic-2017 = 100) son reutilizables bajo la licencia de información pública del BCP, citando fuente y fecha de actualización y sin sugerir aval oficial.
 - [ ] **S3** — Comparar proveedores de almacenamiento de objetos con borrado automático por TTL: coste, latencia desde Paraguay y facilidad de operación.
 - [ ] **S4** — Reunir entre 20 y 30 fotos de tickets paraguayos reales (distintas cadenas, distinto estado de conservación) y transcribirlas a mano: es el conjunto de referencia para medir precisión.
 - [ ] **S4** — Evaluar modelos de visión candidatos contra ese conjunto: precisión por campo, coste y latencia por ticket. Decidir y registrar el motivo de la elección.
@@ -115,11 +115,13 @@
 - [ ] **E6-1** — Cálculo del relativo de precio entre periodos consecutivos.
 - [ ] **E6-2** — Índice de Jevons por categoría sobre productos emparejados en ambos periodos.
 - [ ] **E6-3** — Agregación ponderada a índice general, con ponderaciones configurables y versionadas.
+- [ ] 🚧 **E6-3 (S2)** — Decidir el ámbito geográfico del índice propio. El IPC del BCP cubre **sólo el Área Metropolitana de Asunción** (Asunción, Luque, Fernando de la Mora, Lambaré, San Lorenzo, Capiatá, Ñemby, Mariano Roque Alonso y Limpio). O acotamos nuestra cobertura a lo mismo, o acotamos la comparación de E7-3 a los tickets de esa zona, o publicamos la superposición con la advertencia explícita. Decidir antes de escribir `docs/metodologia.md`: cambia lo que el portal promete.
+- [ ] **E6-3 (S2)** — Etiquetar cada serie con la versión de canasta y la base del IPC usadas. La **EPF 2025-2026** terminó su recogida en septiembre de 2026 y va a cambiar ponderaciones y estructura: cuando el BCP difunda la nueva canasta habrá que empalmar, y sin la etiqueta no se sabrá qué se está comparando.
 - [ ] **E6-4** — 🚧 Umbrales mínimos de observaciones: por debajo de ellos la categoría se marca *sin datos suficientes* y no publica cifra.
 - [ ] **E6-5** — Proceso de recálculo del histórico, idempotente y reproducible, con versión de metodología asociada a cada serie.
 - [ ] **E6** — Persistir el índice calculado por periodo, con su número de observaciones y productos emparejados.
 - [ ] **E6** — Verificar el cálculo a mano sobre una categoría pequeña, contrastando contra una hoja de cálculo independiente.
-- [ ] **E6-6** — Redactar `docs/metodologia.md`: fórmula, fuentes, umbrales y limitaciones conocidas.
+- [ ] **E6-6** — Redactar `docs/metodologia.md`: fórmula, fuentes, umbrales y limitaciones conocidas. Entre las limitaciones, la que S2 dejó por escrito: el IPC es una canasta fija y nuestros tickets son compras concretas, así que la comparación contextualiza pero no prueba que nuestra muestra reproduzca la canasta oficial.
 
 ---
 
@@ -132,7 +134,7 @@
 - [ ] **E7-6** — Página de inicio: la propuesta en una frase y acceso directo a subir un ticket.
 - [ ] **E7-1** — Cifra del índice general del último periodo cerrado, con fecha y número de observaciones.
 - [ ] **E7-2** — Gráfico de la serie histórica con selector de periodo.
-- [ ] **E7-3** — Superponer la serie oficial del IPC, citando fuente y fecha de actualización.
+- [ ] **E7-3** — Superponer la serie oficial del IPC, citando fuente y fecha de actualización. La licencia de información pública del BCP lo permite, pero exige citar y **no sugerir aval ni patrocinio oficial**: nada de logos del BCP ni de presentación que insinúe respaldo. Conservar el fichero descargado con su URL y fecha, no depender de la página dinámica.
 - [ ] **E7-4** — Desglose por categoría, ordenable, con las categorías sin datos suficientes marcadas como tales.
 - [ ] **E7-5** — Panel de cobertura: tickets procesados, productos con seguimiento, comercios y periodo cubierto.
 - [ ] **E7** — Enlazar `docs/metodologia.md` desde el portal.
@@ -183,7 +185,7 @@
 
 ## Notas de secuencia
 
-- **S1 antes que E3.** Si el QR del comprobante electrónico resulta viable, buena parte de la extracción con IA deja de ser el camino principal. Investigar antes de construir.
+- **~~S1 antes que E3~~ — resuelto: E3 sigue en pie.** El QR no da el detalle de ítems; lo da el XML del Documento Electrónico, y sólo al receptor que además es facturador electrónico. Admitir ese XML es una mejora que vale la pena —ahorra la llamada al modelo y trae el dato firmado en origen— pero es una vía paralela, no un sustituto: hasta 2027 seguirán llegando tickets sin él. Construir E3.
 - **E5 es la épica larga.** La normalización de productos condiciona todo lo que viene después: conviene empezarla en cuanto haya tickets reales en la base, incluso en paralelo con el final de la Fase 1.
 - **El antifraude no se pospone.** Está en la Fase 3 porque necesita datos y portal, pero las piezas baratas — deduplicación y validación aritmética — ya entran en la Fase 1.
 - **Sin datos no hay índice.** Las fases 2 y 3 necesitan tickets reales acumulados; conviene empezar a recolectarlos en cuanto la Fase 1 funcione, aunque el portal aún no exista.

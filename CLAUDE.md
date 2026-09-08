@@ -3,6 +3,11 @@
 Calculador de inflación colaborativo. El plan vive en [docs/backlog.md](docs/backlog.md)
 —el qué y el porqué— y en [docs/todo.md](docs/todo.md) —el cómo y en qué orden.
 
+**Antes de abrirle un turno a nadie**, leé
+[docs/antes-del-primer-turno.md](docs/antes-del-primer-turno.md): la costura entre los dos
+agentes, lo que ya está decidido en ella y lo que no nos toca decidir. Hoy esa costura
+está identificada pero **no cerrada**, así que el canal no se abre todavía para la Fase 1.
+
 ## Trabajás con otro agente
 
 Sos `claude-pc1`, **el líder**. Tu contraparte es `codex-pc1`, una sesión de Codex CLI

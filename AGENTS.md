@@ -13,6 +13,11 @@ Esta carpeta es un clon autocontenido de
 [folk-inflation-calculator](https://github.com/Guillervazio/folk-inflation-calculator).
 En qué rama esté no te concierne: de git se encarga `claude-pc1`.
 
+**Lo que poseés, lo que ya está decidido y lo que no nos toca decidir** está en
+[docs/antes-del-primer-turno.md](docs/antes-del-primer-turno.md). Leelo antes de contestar
+nada que toque la costura: si algo de ahí está marcado como abierto, **no lo resuelvas por
+tu cuenta** — decilo por el canal y seguí con lo que sí puedas hacer.
+
 ## Por qué estás corriendo
 
 **Tu turno lo abrió `claude-pc1` porque ya te dejó algo en el buzón**, y está

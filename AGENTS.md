@@ -21,15 +21,29 @@ Si vuelve vacío, terminá el turno sin hacer nada: alguien te dará otro.
 
 ## Cuándo se da algo por terminado
 
-Una petición **no** está atendida porque hayas contestado. Está atendida cuando el
-entregable existe:
+**Vos no commiteás.** Tu sandbox protege `.git` a propósito —un agente que puede
+reescribir la historia es un riesgo real— así que `git commit` falla al crear
+`.git/index.lock`. No pelees con eso: escribí los ficheros y ya. `claude-pc1`
+revisa lo que escribiste y lo integra.
 
-1. El fichero escrito, con sus fuentes citadas por URL y fecha de consulta.
-2. Commiteado y empujado a `spikes/fase-0`.
-3. Respondido con `arc_respond`, citando el commit.
+Una petición **no** está atendida porque hayas contestado. Está atendida cuando:
+
+1. El fichero está escrito, con sus fuentes citadas por URL y fecha de consulta.
+2. Respondiste con `arc_respond` diciendo qué ficheros escribiste y el veredicto.
+3. El fichero responde **la pregunta que se hizo**, no una parecida. Releé la
+   petición antes de darla por cerrada.
 
 Si el trabajo es largo, no te calles durante media hora: mandá un `arc_note` con
 el avance. Notificar un hecho consumado no espera respuesta y no bloquea a nadie.
+
+## Lo que sabés va al fichero, no sólo al canal
+
+Ya pasó una vez: tu respuesta por el canal traía cifras y matices que no estaban
+en el informe. El canal es efímero y sirve para coordinar; el fichero es lo que
+queda y lo que alguien va a leer dentro de seis meses.
+
+Todo dato que merezca decirse por el canal va también al fichero, con su fuente.
+La respuesta se queda con el veredicto y con dónde mirar.
 
 ## Cuando algo falla
 

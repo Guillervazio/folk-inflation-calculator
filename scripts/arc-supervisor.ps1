@@ -48,12 +48,13 @@ if (-not (Test-Path (Join-Path $Clone 'AGENTS.md'))) {
     throw "En $Clone no hay AGENTS.md. Sin el Codex no sabe que debe escuchar el canal."
 }
 
-$codex = Get-Command codex -ErrorAction SilentlyContinue
-if ($codex) {
-    $codex = $codex.Source
-} else {
-    $cmd = Join-Path $env:APPDATA 'npm\codex.cmd'
-    if (Test-Path $cmd) { $codex = $cmd } else { throw 'No encuentro el ejecutable de codex.' }
+# El .cmd y no el .ps1 que Get-Command encuentra antes en el PATH: el envoltorio
+# de PowerShell mete otra capa que convierte la salida de error de codex en
+# NativeCommandError y ensucia el codigo de salida.
+$codex = Join-Path $env:APPDATA 'npm\codex.cmd'
+if (-not (Test-Path $codex)) {
+    $enPath = Get-Command codex -ErrorAction SilentlyContinue
+    if ($enPath) { $codex = $enPath.Source } else { throw 'No encuentro el ejecutable de codex.' }
 }
 
 # Fuera del clon a proposito: dentro serian ficheros sin seguimiento que Codex
@@ -68,8 +69,9 @@ Turno automatico del supervisor. Segui lo que dice AGENTS.md.
 
 1. Llama a arc_inbox con wait=$Wait. Vas a quedarte bloqueado ahi: es normal.
 2. Si vuelve vacio, termina el turno sin hacer nada y sin escribir ficheros.
-3. Si llega algo, atendelo hasta el final: escribi el entregable, commitea y
-   empuja a spikes/fase-0, y responde con arc_respond citando el commit.
+3. Si llega algo, atendelo hasta el final: escribi el entregable y responde con
+   arc_respond diciendo que ficheros escribiste y cual es el veredicto.
+   No commitees: tu sandbox protege .git y de integrar se encarga claude-pc1.
    Si algo falla, responde igual con el error exacto en vez de callarte.
 "@
 
@@ -77,7 +79,14 @@ $argsBase = @('exec', '--cd', $Clone, '--skip-git-repo-check')
 if ($FullAccess) {
     $argsBase += '--dangerously-bypass-approvals-and-sandbox'
 } else {
-    $argsBase += @('--sandbox', 'workspace-write', '-c', 'sandbox_workspace_write.network_access=true')
+    # workspace-write deja escribir en la carpeta pero NO dentro de .git, y esa
+    # proteccion se respeta: un agente que puede reescribir la historia es un
+    # riesgo real. Por eso Codex no commitea — escribe, y claude-pc1 integra.
+    # La red si hace falta, para que pueda consultar fuentes.
+    $argsBase += @(
+        '--sandbox', 'workspace-write',
+        '-c', 'sandbox_workspace_write.network_access=true'
+    )
 }
 
 function Write-Log([string]$texto) {
@@ -100,7 +109,11 @@ try {
         Write-Log "--- turno $turno ---"
         $inicio = Get-Date
 
-        & $codex @argsBase $prompt
+        # El prompt entra por stdin y no como argumento. Pasandolo como argumento,
+        # codex se queda leyendo la entrada estandar ("Reading additional input
+        # from stdin...") en cuanto no hay una consola detras, que es justo el
+        # caso de este bucle. Con '-' la lee a proposito y no hay ambiguedad.
+        $prompt | & $codex @argsBase '-'
         $codigo = $LASTEXITCODE
 
         $duracion = [int]((Get-Date) - $inicio).TotalSeconds

@@ -17,7 +17,12 @@ alguien no debe ser el usuario.
 
 1. **Encolá sin esperar:** `arc ask … --wait 0`. Te devuelve un `request_id` y sale con
    código `3`, que acá es lo correcto.
-2. **Abrile el turno**, en segundo plano: `scripts/arc-turn-codex.ps1`.
+2. **Abrile el turno**, en segundo plano:
+
+   ```powershell
+   powershell -NoProfile -Command $env:ARC_TURN_CODEX_PC1
+   ```
+
 3. **Recién ahora bloqueate:** `arc await <request_id> --wait 300`.
 
 Bloquear primero es el error que hay que nombrar: `arc ask --wait 300` como primer
@@ -78,4 +83,25 @@ Lo específico de esta máquina:
 | Hub | contenedor `arc-hub`, `127.0.0.1:8765`, volumen `arc-data` |
 | Panel | <http://127.0.0.1:8765/ui> |
 | Clon de la contraparte | `..\folk-inflation-spikes`, en `main` entre incrementos |
-| Comando de turno | [scripts/arc-turn-codex.ps1](scripts/arc-turn-codex.ps1) |
+| Comando de turno | variable de usuario `ARC_TURN_CODEX_PC1` |
+
+El comando de turno es **configuración de esta máquina**, no código de este repositorio:
+nombra el ejecutable de Codex, sus flags y su sandbox, y las tres cosas cambian por
+debajo cuando cambia su versión. Por eso vive en una variable de entorno y no en un
+fichero versionado — es la misma razón por la que ARC envía un marcador de posición y no
+un comando. Su contenido, hoy:
+
+```powershell
+'Segui AGENTS.md.' | & "$env:APPDATA\npm\codex.cmd" exec `
+  --cd 'C:\Users\Guille\Claude Stuff\folk-inflation-spikes' `
+  --skip-git-repo-check --sandbox workspace-write `
+  -c sandbox_workspace_write.network_access=true -
+```
+
+El prompt es una frase a propósito: las reglas están en [AGENTS.md](AGENTS.md) y el
+handshake trae las del canal. Repetirlas acá sería una tercera copia.
+
+El `-` final no es adorno: el prompt tiene que entrar por *stdin*, porque pasándolo como
+argumento Codex se queda leyendo la entrada estándar en cuanto no hay consola detrás.
+`--skip-git-repo-check` está sin verificar — el clon es un repositorio, pero el sandbox
+lo ve con propiedad dudosa y puede que la comprobación falle igual.

@@ -199,33 +199,62 @@ markdown file ARC replaced. A shared remote is a precondition, not a nicety.
 
 ## 5. Who commits
 
-Codex's `workspace-write` sandbox lets an agent write inside its working directory but **not
-inside `.git`**. `git commit` dies creating `.git/index.lock`.
+An agent under Codex's sandbox could not commit. The first explanation offered — its own report —
+was that `git commit` died creating `.git/index.lock`, which reads like `workspace-write`
+excluding `.git`. **That explanation is wrong, and it is worth spelling out how, because the
+wrong one is far more plausible than the right one.**
 
-This is a deliberate protection and a good one: an agent that can write git metadata can rewrite
-history. You have two coherent answers, and the choice is worth making explicitly rather than by
-accident.
-
-**Option A — the agent commits its own work.** Add its `.git` as an explicit writable root:
+Probing it directly, with `git` invoked rather than a commit attempted:
 
 ```
--c sandbox_workspace_write.writable_roots=['<clone>\.git']
+$ git rev-parse --git-dir
+fatal: detected dubious ownership in repository at 'C:/…/agent-b-clone'
+'C:/…/agent-b-clone' is owned by:
+        'S-1-5-21-…-1001'
+but the current user is:
+        'S-1-5-21-…-1006'
 ```
 
-`sandbox_workspace_write.writable_roots` is a real configuration key. *We did not verify that
-this specific use works* — the permission prompt for it was declined and we took the other path,
-so treat it as untested.
+**The sandbox executes as a different Windows user than the one that owns the clone.** With
+`[windows] sandbox = "elevated"` in `~/.codex/config.toml`, commands run under a restricted token
+with its own SID. Git's `safe.directory` protection then refuses to treat the directory as a
+repository at all — and every later error (`--local can only be used inside a git repository`)
+is a consequence of that refusal, not an independent finding.
+
+So the constraint is not "`.git` is read-only". It is "**git does not work here**", for a reason
+that has nothing to do with ARC, with sandboxes writing files, or with which directory is
+writable. The agent writes files in its working directory perfectly well.
+
+### What follows
+
+**Option A — make git usable inside the sandbox.** The ownership exception has to exist for the
+*sandbox's* identity, not yours, so `git config --global --add safe.directory …` run as yourself
+does not help. Untested here; if you take this path, verify it rather than assuming it.
 
 **Option B — the writing agent does not commit; the integrating agent does.** This is what we
-ran, and it turned out to be better than a workaround:
+ran, and the probe above makes it a better default than it first appeared:
 
-- The sandbox's protection is respected rather than negotiated away.
+- It needs no configuration at all, and nothing about the sandbox has to be negotiated away.
 - The reviewing agent is already deciding whether the work is finished. Committing what it has
   accepted is the same act, not an extra one.
-- One whole class of failure leaves the loop.
+- It is indifferent to *why* the agent cannot commit — ownership, policy, or a future change in
+  another project's CLI.
 
 Under Option B the deliverable is a **file written and an answer sent**. Everything about
 committing, merging and pushing belongs to the integrator.
+
+### A second, separate restriction
+
+In the same probe, this was refused outright:
+
+```
+powershell.exe -Command "Remove-Item -LiteralPath 'probe.tmp' -Force" → rejected: blocked by policy
+```
+
+while `powershell.exe -NoProfile -Command 'git rev-parse --git-dir'` in the very same
+configuration ran fine. The policy is not blocking the shell; it is blocking **deletion**. An
+agent that writes a file it later wants to remove will get stuck, and — as ours did — may retry
+the write-then-delete cycle in a loop. Tell it not to create temporary files.
 
 ---
 
@@ -282,7 +311,7 @@ Automatic supervisor turn. Follow AGENTS.md.
 2. If it comes back empty, end the turn without doing anything.
 3. If something arrives, see it through: write the deliverable and answer with
    arc_respond, saying which files you wrote and what the verdict is.
-   Do not commit: your sandbox protects .git and the integrator handles it.
+   Do not commit and do not create temporary files: the integrator handles git.
    If anything fails, answer anyway with the exact error instead of going quiet.
 "@
 
@@ -396,9 +425,13 @@ another.
 
 ## You do not commit
 
-Your sandbox protects `.git` on purpose — an agent that can rewrite history is a
-real risk — so `git commit` fails creating `.git/index.lock`. Do not fight it:
-write the files and stop there. `claude-lead` reviews and integrates.
+Git does not work from inside your sandbox: it runs as a different user than the
+one that owns this clone, so git refuses it as a dubious-ownership repository. Do
+not fight it and do not try to work around it — write the files and stop there.
+`claude-lead` reviews and integrates.
+
+Do not create temporary files either. Deletion is blocked by policy, so anything
+you write to clean up later, you cannot clean up.
 
 ## When something is finished
 
@@ -485,7 +518,8 @@ Ordered roughly by how much time each one costs before you understand it.
 | Symptom | Cause | Fix |
 |---|---|---|
 | Agent reports the working folder "became inaccessible"; filesystem operations hang | It was given a **git worktree**; `.git` points outside its sandbox | Use a plain clone (§4) |
-| `git commit` fails on `.git/index.lock` | `workspace-write` protects `.git` deliberately | Change who commits, or add the writable root (§5) |
+| `git` refuses to work: *detected dubious ownership* | The sandbox runs as a **different Windows user** than the owner of the clone, so git's `safe.directory` check rejects it. Symptoms downstream — including a `git commit` that appears to fail on `.git/index.lock` — are consequences of this | Let the integrator commit (§5) |
+| A write-then-delete loop the agent never escapes | Deletion is `blocked by policy`; the write succeeds, the cleanup does not, and it retries | Tell the agent not to create temporary files (§5) |
 | `Reading additional input from stdin...` then exit 1 | `codex exec` given the prompt as an argument, with no console attached | Pass the prompt on stdin with `-` |
 | Every agent gets `401`, config looks right | Stale demo token left in `~/.codex/config.toml` | Replace it; verify with a real `initialize` call |
 | Token works nowhere and looks like `AAAAAAA…` | `RandomNumberGenerator::Fill` does not exist on PowerShell 5.1; it failed silently | `RNGCryptoServiceProvider`, plus a guard (§3.1) |

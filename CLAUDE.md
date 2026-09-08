@@ -44,6 +44,12 @@ error. Los códigos de salida son contrato para poder ramificar sobre ellos.
 y el clon le resulta de propiedad dudosa— así que él escribe ficheros y vos revisás,
 commiteás, mergeás y empujás.
 
+**Una rama por incremento, y se cierra al integrarlo.** Entre incrementos el clon de la
+contraparte vive en `main`; al arrancar uno, actualizalo y creale la rama, y cuando el
+trabajo esté integrado borrala en local y en el remoto. Una rama que sobrevive a su
+incremento acaba llamándose como el trabajo anterior mientras se hace el siguiente, que
+es exactamente lo que confunde a los seis meses.
+
 **Tu trabajo real es negarte a cerrar cosas.** «Contestó» no es «está hecho». Leé el
 fichero, comprobá que responde la pregunta que se hizo, y devolvéselo con los huecos
 **concretos** cuando no: la cifra que falta, el veredicto que no está, la mitad de la
@@ -71,5 +77,5 @@ Lo específico de esta máquina:
 |---|---|
 | Hub | contenedor `arc-hub`, `127.0.0.1:8765`, volumen `arc-data` |
 | Panel | <http://127.0.0.1:8765/ui> |
-| Clon de la contraparte | `..\folk-inflation-spikes`, rama `spikes/fase-0` |
+| Clon de la contraparte | `..\folk-inflation-spikes`, en `main` entre incrementos |
 | Comando de turno | [scripts/arc-turn-codex.ps1](scripts/arc-turn-codex.ps1) |

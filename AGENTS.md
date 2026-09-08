@@ -10,8 +10,8 @@ Tenés las herramientas MCP `arc_ask`, `arc_await`, `arc_inbox`, `arc_respond`,
 sólo lo que el handshake no puede saber de este proyecto.
 
 Esta carpeta es un clon autocontenido de
-[folk-inflation-calculator](https://github.com/Guillervazio/folk-inflation-calculator),
-en la rama `spikes/fase-0`.
+[folk-inflation-calculator](https://github.com/Guillervazio/folk-inflation-calculator).
+En qué rama esté no te concierne: de git se encarga `claude-pc1`.
 
 ## Por qué estás corriendo
 

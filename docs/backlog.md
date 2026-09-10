@@ -232,7 +232,7 @@ Ideas registradas para no perderlas. Ninguna entra en el MVP.
 |---|---|---|---|
 | R1 | **Envenenamiento del índice.** Sin login, un actor decidido puede inyectar precios falsos. | Crítico — destruye la credibilidad del producto | Épica E8 completa dentro del MVP; umbrales de publicación (E6-4); moderación de atípicos. |
 | R2 | **Arranque en frío.** Sin masa crítica de tickets no hay índice publicable durante los primeros meses. | Alto | Comunicar cobertura en lugar de inflación (D6, E7-5); concentrar la captación en pocas cadenas y productos de alta rotación para emparejar antes. |
-| R3 | **Coste de IA por ticket a escala.** El gasto crece linealmente con el éxito. | Alto | Medición desde el día uno (E3-5, E10-3); descarte temprano de imágenes inválidas (E8-6); admitir el XML del comprobante electrónico cuando el usuario pueda aportarlo, que ahorra la llamada al modelo — pero S1 lo deja como mejora parcial y no como salida del riesgo: hasta 2027 seguirán llegando tickets sin XML. |
+| R3 | **Coste de IA por ticket a escala.** El gasto crece linealmente con el éxito. | Alto | Medición desde el día uno (E3-5, E10-3); descarte temprano de imágenes inválidas (E8-6); explorar la vía del QR (S1), que evitaría la llamada al modelo. |
 | R4 | **Sesgo de muestra.** Quien sube tickets probablemente compra en cadenas grandes del área metropolitana: el índice mediría esa realidad, no la del país. | Alto — afecta a la validez de la conclusión | Publicar siempre la composición de la muestra; declarar la limitación en la metodología (E6-6); ponderar por canasta oficial, no por volumen de tickets. |
 | R5 | **Precisión sobre papel térmico degradado.** Tickets arrugados, descoloridos o cortados. | Medio | Revisión humana obligatoria (E4); medición continua de precisión (E3-7); alternativa manual siempre disponible (E3-6). |
 | R6 | **La normalización no escala.** Si cada producto nuevo exige intervención manual, el catálogo se convierte en un cuello de botella permanente. | Alto | Emparejado automático con umbral de confianza (E5-2); medir el porcentaje de emparejado automático como métrica de salud del sistema. |
@@ -240,23 +240,14 @@ Ideas registradas para no perderlas. Ninguna entra en el MVP.
 
 ---
 
-## 7. *Spikes*
+## 7. *Spikes* pendientes
 
-Investigaciones a cerrar antes de comprometer diseño. Las de la primera tabla ya están respondidas y su informe está en `docs/spikes/`; las de la segunda **siguen sin verificar**.
-
-### Cerrados
-
-| # | *Spike* | Respuesta | Qué decide |
-|---|---|---|---|
-| S1 | **QR de comprobante electrónico** | **Parcial.** El detalle de ítems sí se obtiene programáticamente, pero del **XML del Documento Electrónico** que el emisor entrega al receptor —no del QR, que sólo lleva a una consulta pública de validez con reCAPTCHA, sin API de lectura masiva. 19.658 emisores activos al 15-11-2025 y cronograma de incorporación hasta el 01-09-2027. | **E3 se mantiene como camino principal.** El parser de XML entra como mejora aparte, no como sustituto: durante toda la transición seguirán llegando tickets sin XML. Ver [S1-qr-comprobante.md](spikes/S1-qr-comprobante.md). |
-| S2 | **Datos oficiales del IPC** | **Sí, como referencia agregada y con atribución.** El BCP publica el IPC mensual, anexos en hoja de cálculo y PDF, y una serie empalmada desde 1950; las ponderaciones de la EPF 2015/16 (base dic-2017 = 100) son reutilizables bajo su licencia de información pública, citando fuente y fecha y sin sugerir aval oficial. | Decae la alternativa de ponderación propia. Aparecen dos límites nuevos: la cobertura es **sólo el Área Metropolitana de Asunción**, y la **EPF 2025-2026** cambiará la canasta. Ver [S2-ipc-oficial.md](spikes/S2-ipc-oficial.md). |
-
-### Pendientes
-
-**Ninguna de estas afirmaciones está verificada todavía.**
+Investigaciones a cerrar antes de comprometer diseño. **Ninguna de estas afirmaciones está verificada todavía.**
 
 | # | *Spike* | Pregunta a responder | Por qué importa |
 |---|---|---|---|
+| S1 | **QR de comprobante electrónico** | ¿Los comprobantes electrónicos paraguayos llevan un QR del que se pueda recuperar el detalle de ítems de forma verificable y programática? ¿Qué proporción de tickets lo trae hoy? | Si la respuesta es sí, ese camino evita el modelo de visión, elimina el coste por ticket y entrega un dato verificado en origen. Cambiaría la prioridad de E3 por completo. |
+| S2 | **Datos oficiales del IPC** | ¿Publica el BCP la serie del IPC y las ponderaciones de la canasta en formato reutilizable? ¿Con qué frecuencia y bajo qué condiciones de uso? | E6-3 y E7-3 dependen de ello. Sin ponderaciones oficiales hay que definir una alternativa propia y documentarla. |
 | S3 | **Almacenamiento temporal** | ¿Qué proveedor cumple el borrado automático por TTL, con coste razonable y latencia aceptable desde Paraguay? | Condiciona E2, E9-2 y el coste operativo. |
 | S4 | **Elección del modelo de visión** | Precisión, coste y latencia sobre un conjunto de tickets paraguayos reales. | Decide la viabilidad económica de E3. Debe resolverse con tickets reales, no con ejemplos sintéticos. |
 
